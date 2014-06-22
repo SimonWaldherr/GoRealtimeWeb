@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Server Side Events</title>
+  <script type="text/javascript">
+    window.onload = function() {
+      var gSocket = new WebSocket("ws://localhost:8000/events/ws");
+      gSocket.onmessage = function(e) {
+        var ao = JSON.parse(e.data);
+        document.body.innerHTML += ao.str + '<br>';
+      };
+    }
+  </script>
+</head>
+<body>
+  <h1>Websocket Example</h1>
+
+</body>
+</html>

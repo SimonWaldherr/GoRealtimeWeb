@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Server-sent Events</title>
+  <script type="text/javascript">
+    window.onload = function() {
+      var source = new EventSource('/events/sse');
+      source.onmessage = function(e) {
+        var ao = JSON.parse(e.data);
+        console.log(ao);
+        document.body.innerHTML += ao.str + '<br>';
+      };
+    }
+  </script>
+</head>
+<body>
+  <h1>Server-sent Events Example</h1>
+
+</body>
+</html>

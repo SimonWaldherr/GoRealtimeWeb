@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Long Polling</title>
+  <script type="text/javascript" src="https://raw.githubusercontent.com/jimhigson/oboe.js/master/dist/oboe-browser.min.js"></script>
+  <script>
+    window.onload = function() {
+      oboe('/events/lp')
+      .done(function(ao){
+         console.log(ao);
+         document.body.innerHTML += ao.str + '<br>';
+      });
+    }
+  </script>
+</head>
+<body>
+  <h1>Long Polling Example</h1>
+
+</body>
+</html>
