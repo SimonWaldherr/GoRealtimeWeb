@@ -8,6 +8,8 @@ This repository contains examples for the following real-time implementations:
 * [Long Polling](http://en.wikipedia.org/wiki/Push_technology#Long_polling)
 * [Websocket](http://en.wikipedia.org/wiki/WebSocket)
 
+Most of the **long polling** systems close the connection after each transmission from the server, with the help of [oboe.js](https://github.com/jimhigson/oboe.js) this example can handle multiple messages from the server in realtime without closing/reconnecting.  
+
 ##howto
 
 1. install dependencies ```go get code.google.com/p/go.net/websocket```
