@@ -3,19 +3,25 @@
 <head>
   <meta charset="utf-8">
   <title>Server-sent Events</title>
+  <script type="text/javascript" src="script.js"></script>
   <script type="text/javascript">
     window.onload = function() {
+      document.getElementById("input").focus();
       var source = new EventSource('/events/sse');
       source.onmessage = function(e) {
         var ao = JSON.parse(e.data);
         console.log(ao);
-        document.body.innerHTML += ao.str + '<br>';
+        document.getElementById('stream').innerHTML += ao.str + '<br>';
       };
     }
   </script>
 </head>
 <body>
   <h1>Server-sent Events Example</h1>
-
+  <div id="stream"></div>
+  <form action="/send" method="post" onsubmit="post(); return false;">
+    <input type="text" id="input" value="">
+    <input type="submit" value="submit">
+  </form>
 </body>
 </html>

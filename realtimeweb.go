@@ -14,6 +14,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"io/ioutil"
 )
 
 type Connections struct {
@@ -57,6 +58,17 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Path == "/send" {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Println(err)
+		}
+		str := string(body)
+		hub.messages <- str
+		f.Flush()
+		return
+	}
+
 	messageChannel := make(chan string)
 	hub.addClient <- messageChannel
 	notify := w.(http.CloseNotifier).CloseNotify()
@@ -72,14 +84,14 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 			str := string(jsonData)
 			if r.URL.Path == "/events/sse" {
 				fmt.Fprintf(w, "data: {\"str\": %s, \"time\": \"%v\"}\n\n", str, time.Now())
-			} else {
+			} else if r.URL.Path == "/events/lp" {
 				fmt.Fprintf(w, "{\"str\": %s, \"time\": \"%v\"}", str, time.Now())
 			}
 			f.Flush()
 		case <- time.After(time.Second * 60):
 			if r.URL.Path == "/events/sse" {
 				fmt.Fprintf(w, "data: {\"str\": \"No Data\"}\n\n")
-			} else {
+			} else if r.URL.Path == "/events/lp" {
 				fmt.Fprintf(w, "{\"str\": \"No Data\"}")
 			}
 			f.Flush()
@@ -151,6 +163,7 @@ func main() {
 
 	hub.Init()
 
+	http.HandleFunc("/send", httpHandler)
 	http.HandleFunc("/events/sse", httpHandler)
 	http.HandleFunc("/events/lp", httpHandler)
 	http.Handle("/events/ws", websocket.Handler(websocketHandler))
