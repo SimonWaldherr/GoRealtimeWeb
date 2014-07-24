@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"io/ioutil"
 )
 
 type Connections struct {
@@ -35,13 +35,13 @@ func (hub *Connections) Init() {
 	go func() {
 		for {
 			select {
-			case s := <- hub.addClient:
+			case s := <-hub.addClient:
 				hub.clients[s] = true
 				log.Println("Added new client")
-			case s := <- hub.removeClient:
+			case s := <-hub.removeClient:
 				delete(hub.clients, s)
 				log.Println("Removed client")
-			case msg := <- hub.messages:
+			case msg := <-hub.messages:
 				for s, _ := range hub.clients {
 					s <- msg
 				}
@@ -79,7 +79,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < 1440; {
 		select {
-		case msg := <- messageChannel:
+		case msg := <-messageChannel:
 			jsonData, _ := json.Marshal(msg)
 			str := string(jsonData)
 			if r.URL.Path == "/events/sse" {
@@ -88,7 +88,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, "{\"str\": %s, \"time\": \"%v\"}", str, time.Now())
 			}
 			f.Flush()
-		case <- time.After(time.Second * 60):
+		case <-time.After(time.Second * 60):
 			if r.URL.Path == "/events/sse" {
 				fmt.Fprintf(w, "data: {\"str\": \"No Data\"}\n\n")
 			} else if r.URL.Path == "/events/lp" {
@@ -96,7 +96,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			f.Flush()
 			i++
-		case <- notify:
+		case <-notify:
 			f.Flush()
 			i = 1440
 			hub.removeClient <- messageChannel
@@ -111,12 +111,12 @@ func websocketHandler(ws *websocket.Conn) {
 
 	for i := 0; i < 1440; {
 		select {
-		case msg := <- messageChannel:
+		case msg := <-messageChannel:
 			jsonData, _ := json.Marshal(msg)
 			str := string(jsonData)
 			in = fmt.Sprintf("{\"str\": %s, \"time\": \"%v\"}\n\n", str, time.Now())
 			websocket.Message.Send(ws, in)
-		case <- time.After(time.Second * 60):
+		case <-time.After(time.Second * 60):
 			in = fmt.Sprintf("{\"str\": \"No Data\"}\n\n")
 			websocket.Message.Send(ws, in)
 			i++
