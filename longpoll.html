@@ -7,21 +7,22 @@
   <script type="text/javascript" src="script.js"></script>
   <script>
     window.onload = function() {
+      var stream = document.getElementById('stream');
       document.getElementById("input").focus();
       oboe('/events/lp')
       .done(function(ao){
          console.log(ao);
-         document.getElementById('stream').innerHTML += ao.str + '<br>';
+         stream.innerHTML = htmlEscape(ao.str) + '<br>' + stream.innerHTML;
       });
     }
   </script>
 </head>
 <body>
   <h1>Long Polling Example</h1>
-  <div id="stream"></div>
   <form action="/send" method="post" onsubmit="post(); return false;">
     <input type="text" id="input" value="">
     <input type="submit" value="submit">
-  </form>
+  </form><br>
+  <div id="stream"></div>
 </body>
 </html>
