@@ -115,12 +115,19 @@ func websocketHandler(ws *websocket.Conn) {
 			jsonData, _ := json.Marshal(msg)
 			str := string(jsonData)
 			in = fmt.Sprintf("{\"str\": %s, \"time\": \"%v\"}\n\n", str, time.Now())
-			websocket.Message.Send(ws, in)
+
+			if err := websocket.Message.Send(ws, in); err != nil {
+				hub.removeClient <- messageChannel
+				i = 1440
+			}
 		case <-time.After(time.Second * 60):
 			in = fmt.Sprintf("{\"str\": \"No Data\"}\n\n")
-			websocket.Message.Send(ws, in)
-			i++
+			if err := websocket.Message.Send(ws, in); err != nil {
+				hub.removeClient <- messageChannel
+				i = 1440
+			}
 		}
+		i++
 	}
 }
 
