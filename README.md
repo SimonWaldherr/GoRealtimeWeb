@@ -15,7 +15,7 @@ Most of the **long polling** systems close the connection after each transmissio
 
 ##howto
 
-1. install dependencies ```go get code.google.com/p/go.net/websocket```
+1. install dependencies ```go get golang.org/x/net/websocket```
 2. run the go script ```go run realtimeweb.go```
 3. open **<http://localhost:8000>** and choose an example  
 4. connect to localhost port 8001 via telnet (```telnet localhost 8001```)
